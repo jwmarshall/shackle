@@ -1,0 +1,61 @@
+options {
+    directory "/var/bind";
+    pid-file "/var/run/named/named.pid";
+
+    listen-on { any; };
+    listen-on-v6 { none; };
+
+    allow-recursion { any; };
+    allow-transfer { none; };
+
+    auth-nxdomain no;
+
+    dnssec-enable yes;
+    dnssec-validation yes;
+
+    forwarders {
+      {% set forwarders = '8.8.8.8,8.8.4.4' | env_override('FORWARDERS') -%}
+      {% for i in forwarders.split(',') -%}
+        {{ i }};
+      {% endfor -%}
+    };
+
+    response-policy {
+      {% set overrides = '' | env_override('OVERRIDES') -%}
+      {% for i in overrides.split(',') -%}
+      zone "override-{{ i.replace('.zone','') }}";
+      {% endfor -%}
+    };
+};
+
+logging {
+    channel default_debug { stderr; };
+};
+
+zone "." IN {
+    type hint;
+    file "named.ca";
+};
+
+zone "localhost" IN {
+    type master;
+    file "pri/localhost.zone";
+    allow-update { none; };
+    notify no;
+};
+
+zone "127.in-addr.arpa" IN {
+    type master;
+    file "pri/127.zone";
+    allow-update { none; };
+    notify no;
+};
+
+{% for i in overrides.split(',') -%}
+zone "override-{{ i.replace('.zone','') }}" IN {
+    type master;
+    file "overrides/{{ i }}";
+    allow-query { none; };
+};
+{% endfor -%}
+
