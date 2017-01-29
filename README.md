@@ -12,16 +12,16 @@ Shackle is a Bind DNS server configured to overlay custom DNS results using [res
 
 Run the shackle docker image.
 
-`docker run -d -p 53:53/udp --name shackle shackle`
+`docker run -d -p 53:53/udp --name shackle jwmarshall/shackle`
 
 Use shackle with custom forwarders.
 
-`docker run -d -p 53:53/udp -e FORWARDERS=192.168.1.1,192.168.2.1,192.168.3.1 --name shackle shackle`
+`docker run -d -p 53:53/udp -e FORWARDERS=192.168.1.1,192.168.2.1,192.168.3.1 --name shackle jwmarshall/shackle`
 
 Of course you probably want to add your own custom domains to the server.
 
-`docker run -d -p 53:53/udp -v /your/overrides:/var/bind/overrides:ro --name shackle shackle`
+`docker run -d -p 53:53/udp -v /your/overrides:/var/bind/overrides:ro --name shackle jwmarshall/shackle`
 
 Alternatively, build your own Docker image with the zones in the `overrides` directory in this repo.
 
-`docker build -t shackle .`
+`docker build -t jwmarshall/shackle .`
